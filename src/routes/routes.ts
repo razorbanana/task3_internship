@@ -1,6 +1,6 @@
 import express from "express"
 import morgan from "morgan"
-import { getNotes, getNoteById} from "../repositories/repository.js"
+import { getNotes, getNoteById } from "../repositories/repository.js"
 import NoteService from "../services/service.js"
 
 
@@ -22,8 +22,12 @@ app.use(morgan(function (tokens, req, res) {
 app.use(express.json());
 
 app.get('/notes/stats', (request, response) => {
-    const stats = NoteService.getNoteStats()
-    response.json(stats);
+    try {
+        const stats = NoteService.getNoteStats();
+        response.json(stats);
+    } catch (error) {
+        response.status(500).json({ error: 'Internal server error' });
+    }
 })
 
 app.get('/notes', (request, response) => {
@@ -41,30 +45,39 @@ app.get('/notes/:id', (request, response) => {
 })
 
 app.delete('/notes/:id', (request, response) => {
-    const id = Number(request.params.id)
-    NoteService.deleteNoteById(id)
-    response.status(204).end()
+    try {
+        const id = Number(request.params.id);
+        NoteService.deleteNoteById(id);
+        response.status(204).end();
+    } catch (error) {
+        response.status(500).json({ error: 'Internal server error' });
+    }
 })
 
 app.post('/notes', (request, response) => {
-    const body = request.body
-    console.log(request.body)
-
-    if (!body.name || !body.category || !body.content) {
-        response.status(400).json({
-            error: 'content missing'
-        })
+    try {
+        const body = request.body;
+        if (!body.name || !body.category || !body.content) {
+            response.status(400).json({
+                error: 'content missing',
+            });
+        }
+        const note = NoteService.createNote(body);
+        response.json(note);
+    } catch (error) {
+        response.status(500).json({ error: 'Internal server error' });
     }
-
-    const note = NoteService.createNote(body)
-    response.json(note)
 })
 
 app.patch('/notes/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const updates = request.body
-    NoteService.updateNoteById(id, updates)
-    response.status(204).end()
+    try {
+        const id = Number(request.params.id);
+        const updates = request.body;
+        NoteService.updateNoteById(id, updates);
+        response.status(204).end();
+    } catch (error) {
+        response.status(500).json({ error: 'Internal server error' });
+    }
 })
 
 export default app
