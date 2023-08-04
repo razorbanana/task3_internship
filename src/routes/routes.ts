@@ -56,16 +56,22 @@ app.delete('/notes/:id', (request, response) => {
 
 app.post('/notes', (request, response) => {
     try {
-        const body = request.body;
+        const body = request.body
         if (!body.name || !body.category || !body.content) {
             response.status(400).json({
                 error: 'content missing',
             });
         }
-        const note = NoteService.createNote(body);
-        response.json(note);
+        const note = NoteService.createNote(body)
+        response.json(note)
     } catch (error) {
-        response.status(500).json({ error: 'Internal server error' });
+        if (error instanceof Error && error.message === 'Invalid data for creating note') {
+            response.status(400).json({
+                error: 'Invalid data for note',
+            });
+        } else {
+            response.status(500).json({ error: 'Internal server error' })
+        }
     }
 })
 
@@ -76,7 +82,13 @@ app.patch('/notes/:id', (request, response) => {
         NoteService.updateNoteById(id, updates);
         response.status(204).end();
     } catch (error) {
-        response.status(500).json({ error: 'Internal server error' });
+        if (error instanceof Error && error.message === 'Invalid data for updating note') {
+            response.status(400).json({
+                error: 'Invalid data for note',
+            });
+        } else {
+            response.status(500).json({ error: 'Internal server error' })
+        }
     }
 })
 

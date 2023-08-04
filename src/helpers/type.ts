@@ -14,4 +14,10 @@ interface StatsObject {
     archieved: number
 }
 
-export {Note, StatsObject}
+interface NoteData {
+    name: string,
+    category: string,
+    content: string,
+}
+
+export {Note, StatsObject, NoteData}
