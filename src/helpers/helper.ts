@@ -1,4 +1,4 @@
-import { Note, StatsObject } from "./type.js";
+import { Note, NoteData, StatsObject } from "./type.js";
 
 const generateId = (notes: Note[]) => {
     return 1 + notes.reduce((acc, currentValue) => currentValue.id > acc ? currentValue.id : acc, 1)
@@ -62,5 +62,26 @@ const summarizeCategories = (allNotes: Note[]) => {
     }, [])
 }
 
+function isStrictNoteData(obj: any): obj is NoteData {
+    return (
+        typeof obj.name === 'string' &&
+        typeof obj.category === 'string' &&
+        typeof obj.content === 'string' && Object.keys(obj).length === 3
+    );
+}
 
-export {generateId, formatDate, summarizeCategories}
+function isNoteData(obj: any): obj is NoteData {
+    const requiredProps = ['name', 'category', 'content'];
+    const objKeys = Object.keys(obj);
+
+    for (const prop of objKeys) {
+        if (!requiredProps.includes(prop) || typeof obj[prop] !== 'string') {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+
+export { generateId, formatDate, summarizeCategories, isStrictNoteData, isNoteData }
